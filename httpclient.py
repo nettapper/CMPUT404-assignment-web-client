@@ -25,6 +25,7 @@ import re
 import urllib
 import inspect
 import urlparse
+import json
 
 def help():
     print "httpclient.py [GET/POST] [URL]\n"
@@ -55,6 +56,19 @@ class HTTPClient(object):
         request += "User-Agent: simplePythonClient\r\n"
         request += "Host: %s\r\n" % host
         request += "Accept: */*\r\n"
+        return request
+
+    def request_contentlen_and_body(self, args):
+        request = ""
+        if args:
+            jsonArgs = json.dumps(args)
+            request += "Content-type: application/json\r\n"
+            request += "Content-Length: %s\r\n" % str(len(jsonArgs))
+            request += "\r\n"
+            request += jsonArgs
+        else:
+            request += "Content-Length: 0\r\n"
+            request += "\r\n"
         return request
 
     # returns a socket connection
@@ -119,7 +133,7 @@ class HTTPClient(object):
         # Set the headers
         request = "GET %s HTTP/1.0\r\n" % path
         request += self.request_useragent_host_accept(host)
-        request += "\r\n"
+        request += self.request_contentlen_and_body(args)
 
         clientSocket.sendall(request)
         data = self.recvall(clientSocket)
@@ -136,8 +150,7 @@ class HTTPClient(object):
         # Set the headers
         request = "POST %s HTTP/1.0\r\n" % path
         request += self.request_useragent_host_accept(host)
-        request += "Content-Length: 0\r\n"
-        request += "\r\n"
+        request += self.request_contentlen_and_body(args)
 
         clientSocket.sendall(request)
         data = self.recvall(clientSocket)

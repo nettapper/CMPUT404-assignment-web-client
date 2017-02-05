@@ -25,3 +25,5 @@ Resources Used
 * [Python 2 Docs For Urlparse](https://docs.python.org/2/library/urlparse.html?highlight=urlparse#module-urlparse) accessed Feb 5, 2017
 * [Python 2 Docs For Urllib](https://docs.python.org/2/library/urllib.html?highlight=urllib#module-urllib) accessed Feb 5, 2017
 * [Python 2 Docs For Built-in Types](https://docs.python.org/2/library/stdtypes.html#bltin-file-objects) accessed Feb 5, 2017
+* [Python 2 Docs For Json](https://docs.python.org/2/library/json.html?highlight=json#module-json) accessed Feb 5, 2017
+
