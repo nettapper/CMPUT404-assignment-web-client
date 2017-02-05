@@ -24,6 +24,7 @@ import re
 # you may use urllib to encode data appropriately
 import urllib
 import inspect
+import urlparse
 
 def help():
     print "httpclient.py [GET/POST] [URL]\n"
@@ -37,16 +38,19 @@ class HTTPResponse(object):
         return "'" + str(self.code) + " | " + str(self.body) + "'"
 
 class HTTPClient(object):
-    # TODO: fix this
     def get_host_port(self,url):
-        print("TODO: fix the parsing of get_host_port")
-        return "www.google.com", 80
+        netloc = urlparse.urlparse(url).netloc
+        netloc = netloc.split(':')
+        # print('netloc', netloc)
+        if (len(netloc) >= 2):
+            return netloc[0], int(netloc[1])
+        else:
+            return netloc[0], 80
 
     # returns a socket connection
     def connect(self, host, port):
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # sock.connect((host, port))
-        clientSocket.connect(("www.google.com", 80))
+        clientSocket.connect((host, port))
         return clientSocket
 
     def get_code(self, data):
