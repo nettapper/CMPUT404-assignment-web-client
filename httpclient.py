@@ -58,7 +58,29 @@ class HTTPClient(object):
         request += "Accept: */*\r\n"
         return request
 
-    def request_contentlen_and_body(self, args):
+    def urlencode_request_contentlen_and_body(self, args):
+        request = ""
+        if args:
+            urlFormString = ""
+            first = True
+            for key in args:
+                if first:
+                    urlFormString += "%s=%s" % (key, args[key])
+                    first = False
+                else:
+                    urlFormString += "&%s=%s" % (key, args[key])
+            urlFormString.replace(' ', '+')
+
+            request += "Content-type: application/x-www-form-urlencoded\r\n"
+            request += "Content-Length: %s\r\n" % str(len(urlFormString))
+            request += "\r\n"
+            request += urlFormString
+        else:
+            request += "Content-Length: 0\r\n"
+            request += "\r\n"
+        return request
+
+    def json_request_contentlen_and_body(self, args):
         request = ""
         if args:
             jsonArgs = json.dumps(args)
@@ -133,7 +155,8 @@ class HTTPClient(object):
         # Set the headers
         request = "GET %s HTTP/1.0\r\n" % path
         request += self.request_useragent_host_accept(host)
-        request += self.request_contentlen_and_body(args)
+        # request += self.json_request_contentlen_and_body(args)
+        request += self.urlencode_request_contentlen_and_body(args)
 
         clientSocket.sendall(request)
         data = self.recvall(clientSocket)
@@ -150,7 +173,8 @@ class HTTPClient(object):
         # Set the headers
         request = "POST %s HTTP/1.0\r\n" % path
         request += self.request_useragent_host_accept(host)
-        request += self.request_contentlen_and_body(args)
+        # request += self.json_request_contentlen_and_body(args)
+        request += self.urlencode_request_contentlen_and_body(args)
 
         clientSocket.sendall(request)
         data = self.recvall(clientSocket)
