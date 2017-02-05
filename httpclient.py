@@ -38,7 +38,7 @@ class HTTPResponse(object):
         return "'" + str(self.code) + " | " + str(self.body) + "'"
 
 class HTTPClient(object):
-    def get_host_port(self,url):
+    def get_host_port(self, url):
         netloc = urlparse.urlparse(url).netloc
         netloc = netloc.split(':')
         # print('netloc', netloc)
@@ -46,6 +46,16 @@ class HTTPClient(object):
             return netloc[0], int(netloc[1])
         else:
             return netloc[0], 80
+
+    def get_path_from_url(self, url):
+        return urlparse.urlparse(url).path
+
+    def request_useragent_host_accept(self, host):
+        request = ""
+        request += "User-Agent: simplePythonClient\r\n"
+        request += "Host: %s\r\n" % host
+        request += "Accept: */*\r\n"
+        return request
 
     # returns a socket connection
     def connect(self, host, port):
@@ -104,7 +114,13 @@ class HTTPClient(object):
     def GET(self, url, args=None):
         host, port = self.get_host_port(url)
         clientSocket = self.connect(host, port)
-        request = "GET / HTTP/1.0\r\n\r\n"
+        path = self.get_path_from_url(url)
+
+        # Set the headers
+        request = "GET %s HTTP/1.0\r\n" % path
+        request += self.request_useragent_host_accept(host)
+        request += "\r\n"
+
         clientSocket.sendall(request)
         data = self.recvall(clientSocket)
         code = self.get_code(data)
@@ -115,7 +131,14 @@ class HTTPClient(object):
     def POST(self, url, args=None):
         host, port = self.get_host_port(url)
         clientSocket = self.connect(host, port)
-        request = "POST / HTTP/1.0\r\n\r\n"
+        path = self.get_path_from_url(url)
+
+        # Set the headers
+        request = "POST %s HTTP/1.0\r\n" % path
+        request += self.request_useragent_host_accept(host)
+        request += "Content-Length: 0\r\n"
+        request += "\r\n"
+
         clientSocket.sendall(request)
         data = self.recvall(clientSocket)
         code = self.get_code(data)
