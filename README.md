@@ -18,3 +18,7 @@ examples thus some of the code is Copyright © 2001-2013 Python
 Software Foundation; All Rights Reserved under the PSF license (GPL
 compatible) http://docs.python.org/2/library/socketserver.html
 
+Resources Used
+==============
+* [Python 2 Docs For Socket](https://docs.python.org/2.7/library/socket.html?highlight=sendall#socket.socket.sendall) accessed Feb 5, 2017
+* [Python 2 Docs For Inspect](https://docs.python.org/2/library/inspect.html) accessed Feb 5, 2017

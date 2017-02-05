@@ -23,6 +23,7 @@ import socket
 import re
 # you may use urllib to encode data appropriately
 import urllib
+import inspect
 
 def help():
     print "httpclient.py [GET/POST] [URL]\n"
@@ -32,12 +33,21 @@ class HTTPResponse(object):
         self.code = code
         self.body = body
 
-class HTTPClient(object):
-    #def get_host_port(self,url):
+    def __str__(self):
+        return "'" + str(self.code) + " | " + str(self.body) + "'"
 
+class HTTPClient(object):
+    # TODO: fix this
+    def get_host_port(self,url):
+        print("TODO: fix the parsing of get_host_port")
+        return "www.google.com", 80
+
+    # returns a socket connection
     def connect(self, host, port):
-        # use sockets!
-        return None
+        clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # sock.connect((host, port))
+        clientSocket.connect(("www.google.com", 80))
+        return clientSocket
 
     def get_code(self, data):
         return None
@@ -50,19 +60,29 @@ class HTTPClient(object):
 
     # read everything from the socket
     def recvall(self, sock):
-        buffer = bytearray()
-        done = False
-        while not done:
+        response = bytearray()
+        while True:
             part = sock.recv(1024)
             if (part):
-                buffer.extend(part)
+                response.extend(part)
             else:
-                done = not part
-        return str(buffer)
+                break
+        print("returning now")
+        return str(response)
 
     def GET(self, url, args=None):
-        code = 500
-        body = ""
+        print("GET | url:" + url)
+        host, port = self.get_host_port(url)
+        clientSocket = self.connect(host, port)
+        request = "GET / HTTP/1.0\r\n\r\n"
+        clientSocket.sendall(request)
+        data = self.recvall(clientSocket)
+        print(data)
+        # code = self.get_code(data)
+        # headers = self.get_headers(data)   # can we just drop the headers then?
+        # body = self.get_body(data)
+        code = 500  # replace this with the code above
+        body = ""  # replace this with the code above
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
@@ -75,7 +95,7 @@ class HTTPClient(object):
             return self.POST( url, args )
         else:
             return self.GET( url, args )
-    
+
 if __name__ == "__main__":
     client = HTTPClient()
     command = "GET"
@@ -85,4 +105,4 @@ if __name__ == "__main__":
     elif (len(sys.argv) == 3):
         print client.command( sys.argv[2], sys.argv[1] )
     else:
-        print client.command( sys.argv[1] )   
+        print client.command( sys.argv[1] )
