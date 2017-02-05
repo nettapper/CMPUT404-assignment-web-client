@@ -56,7 +56,7 @@ class HTTPClient(object):
     def get_code(self, data):
         words = data.split()
         # print words
-        return words[1]
+        return int(words[1])
 
     def get_headers(self, data):
         lines = data.split("\r\n")
