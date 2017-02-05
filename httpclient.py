@@ -108,13 +108,19 @@ class HTTPClient(object):
         clientSocket.sendall(request)
         data = self.recvall(clientSocket)
         code = self.get_code(data)
-        headers = self.get_headers(data)   # can we just drop the headers then?
+        headers = self.get_headers(data)
         body = self.get_body(data)
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
-        code = 500
-        body = ""
+        host, port = self.get_host_port(url)
+        clientSocket = self.connect(host, port)
+        request = "POST / HTTP/1.0\r\n\r\n"
+        clientSocket.sendall(request)
+        data = self.recvall(clientSocket)
+        code = self.get_code(data)
+        headers = self.get_headers(data)
+        body = self.get_body(data)
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
