@@ -54,13 +54,41 @@ class HTTPClient(object):
         return clientSocket
 
     def get_code(self, data):
-        return None
+        words = data.split()
+        # print words
+        return words[1]
 
-    def get_headers(self,data):
-        return None
+    def get_headers(self, data):
+        lines = data.split("\r\n")
+        # print lines
+        headersList = []
+        for i in range(1, len(lines)):  # start at 1, don't want HTTP Protocol line
+            l = lines[i]
+            if l == '':
+                break
+            else:
+                headersList.append(l)
+        headersMap = {}
+        for header in headersList:
+            headerSplit = header.split(':', 1)  # 1 is the max # of splits
+            assert(len(headerSplit) == 2)
+            key = headerSplit[0]
+            val = headerSplit[1]
+            headersMap[key] = val
+        return headersMap
 
     def get_body(self, data):
-        return None
+        lines = data.split("\r\n")
+        keep = False
+        bodyList = []
+        for l in lines: # ignore line l until we've encountered our first '\r\n'
+            if keep:
+                bodyList.append(l)
+            elif l == '':
+                keep = True
+            else:
+                continue
+        return ''.join(bodyList)
 
     # read everything from the socket
     def recvall(self, sock):
@@ -71,22 +99,17 @@ class HTTPClient(object):
                 response.extend(part)
             else:
                 break
-        print("returning now")
         return str(response)
 
     def GET(self, url, args=None):
-        print("GET | url:" + url)
         host, port = self.get_host_port(url)
         clientSocket = self.connect(host, port)
         request = "GET / HTTP/1.0\r\n\r\n"
         clientSocket.sendall(request)
         data = self.recvall(clientSocket)
-        print(data)
-        # code = self.get_code(data)
-        # headers = self.get_headers(data)   # can we just drop the headers then?
-        # body = self.get_body(data)
-        code = 500  # replace this with the code above
-        body = ""  # replace this with the code above
+        code = self.get_code(data)
+        headers = self.get_headers(data)   # can we just drop the headers then?
+        body = self.get_body(data)
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
