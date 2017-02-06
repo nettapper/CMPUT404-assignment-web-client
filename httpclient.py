@@ -20,10 +20,6 @@
 
 import sys
 import socket
-import re
-# you may use urllib to encode data appropriately
-import urllib
-import inspect
 import urlparse
 import json
 
