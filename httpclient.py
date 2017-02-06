@@ -163,7 +163,18 @@ class HTTPClient(object):
         code = self.get_code(data)
         headers = self.get_headers(data)
         body = self.get_body(data)
-        return HTTPResponse(code, body)
+
+        # do we need to follow a redirect?
+        if (code == 301 or code == 302):
+            # print(code)
+            # print(headers)
+            loc = headers['Location'].strip()
+            if ("https://" in loc):
+                return HTTPResponse(code, body)  # we don't want to follow if for this assn
+            else:
+                return self.GET(loc, args)
+        else:
+            return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
         host, port = self.get_host_port(url)
@@ -181,7 +192,18 @@ class HTTPClient(object):
         code = self.get_code(data)
         headers = self.get_headers(data)
         body = self.get_body(data)
-        return HTTPResponse(code, body)
+
+        # do we need to follow a redirect?
+        if (code == 301 or code == 302):
+            # print(code)
+            # print(headers)
+            loc = headers['Location'].strip()
+            if ("https://" in loc):
+                return HTTPResponse(code, body)  # we don't want to follow if for this assn
+            else:
+                return self.POST(loc, args)
+        else:
+            return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
         if (command == "POST"):
